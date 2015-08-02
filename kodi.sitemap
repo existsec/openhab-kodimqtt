@@ -1,0 +1,13 @@
+sitemap kodi label="Kodi Entertainment System"
+{
+  Frame {
+     Webview url="/kodi/layouts/kodi-thumbnail.html" height=13
+     Text item=Kodi_Title
+     Text item=Kodi_Content_Type
+     Text item=Kodi_Stream_Video_Codec
+     Text item=Kodi_Stream_Audio_Codec
+     Text item=Kodi_Time
+     Text item=Kodi_TotalTime
+     Slider item=Kodi_Progress
+  }
+}

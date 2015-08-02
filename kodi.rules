@@ -1,0 +1,105 @@
+import org.openhab.core.library.types.*
+import org.openhab.core.persistence.*
+import org.openhab.model.script.actions.*
+import org.eclipse.internal.xtend.util.StringHelper
+import java.util.List
+import java.util.ArrayList
+
+// Change to point to the Kodi host and webservice port (no trailing slash)
+var String Kodi_URL = "http://localhost:8080"
+
+
+rule "Kodi_Progress_Raw Parser"
+  when 
+    Item Kodi_Progress_Raw changed
+  then
+    var String json = (Kodi_Progress_Raw.state as StringType).toString
+    var String progress = transform("JSONPATH", "$.val", json)
+    var String time  = transform("JSONPATH", "$.kodi_time", json)
+    var String totaltime  = transform("JSONPATH", "$.kodi_totaltime", json)
+
+    sendCommand(Kodi_Progress,  progress)
+    sendCommand(Kodi_Time, time)
+    sendCommand(Kodi_TotalTime, totaltime) 
+ 
+  end
+  
+rule "Kodi_Title_Raw Parser"
+  when 
+    Item Kodi_Title_Raw changed
+  then
+    
+    // Read Raw MQTT message (JSON) into variable to be used to start our transforms
+    var String json = (Kodi_Title_Raw.state as StringType).toString
+    
+    // Grab the base items in the object and send command to the appropriate items
+    var String title = transform("JSONPATH", "$.kodi_details.title", json)
+    var String type  = transform("JSONPATH", "$.kodi_details.type", json)
+    var String file  = transform("JSONPATH", "$.kodi_details.file", json)
+    var String label  = transform("JSONPATH", "$.kodi_details.label", json)
+    var String kval  = transform("JSONPATH", "$.val", json)
+    
+    sendCommand(Kodi_Title,  title)
+    sendCommand(Kodi_Content_Type, type)
+    sendCommand(Kodi_File_Path, file)
+    sendCommand(Kodi_Label, label)
+    sendCommand(Kodi_Title_Value, kval)
+
+    //Parse and build thumbnail path if it exists and tell the Kodi_Thumbnail item
+    var String thumbnail = transform("JSONPATH", "$.kodi_details.thumbnail", json)
+    if (thumbnail != null) {
+      var String[] thumbnail_array = thumbnail.split("/")
+      var String thumbnail_path = Kodi_URL + "/image/" + thumbnail_array.get(2)
+      sendCommand(Kodi_Thumbnail, thumbnail_path)
+    }
+    
+
+    //Parse and build fanart path if it exists and tell the Kodi_Fanart item
+    var String fanart = transform("JSONPATH", "$.kodi_details.fanart", json)
+    if (fanart != null) {
+      var String[] fanart_array = fanart.split("/")
+      var String fanart_path = Kodi_URL + "/image/" + fanart_array.get(2)
+      sendCommand(Kodi_Fanart, fanart_path)
+    }
+    
+    //First grab the streamdetails object and we'll check if it's present
+    var String streamdetails = transform("JSONPATH", "$.kodi_details.streamdetails", json)
+    
+    if (streamdetails != null) {
+      
+      // Grab the video, audio, and subtitle array's so we can check for presence individually
+      var String video_array = transform("JSONPATH", "$.kodi_details.streamdetails.video[0]", json)
+      var String audio_array = transform("JSONPATH", "$.kodi_details.streamdetails.audio[0]", json)
+      var String subtitle_array = transform("JSONPATH", "$.kodi_details.streamdetails.subtitle[0]", json)
+      
+      // Check if video array exists, grab and send off commands to appropriate items
+      if (video_array != json) {
+        var String stereomode  = transform("JSONPATH", "$.kodi_details.streamdetails.video[0].stereomode", json)
+        var String width  = transform("JSONPATH", "$.kodi_details.streamdetails.video[0].width", json)
+        var String video_codec  = transform("JSONPATH", "$.kodi_details.streamdetails.video[0].codec", json)
+        var String aspect  = transform("JSONPATH", "$.kodi_details.streamdetails.video[0].aspect", json)
+        var String duration  = transform("JSONPATH", "$.kodi_details.streamdetails.video[0].duration", json)
+        var String height  = transform("JSONPATH", "$.kodi_details.streamdetails.video[0].height", json)
+        
+        sendCommand(Kodi_Stream_Video_Stereomode, stereomode)
+        sendCommand(Kodi_Stream_Video_Width, width)
+        sendCommand(Kodi_Stream_Video_Codec, video_codec)
+        sendCommand(Kodi_Stream_Video_Aspect, aspect)
+        sendCommand(Kodi_Stream_Video_Duration, duration)
+        sendCommand(Kodi_Stream_Video_Height, height)
+      }
+      
+      // Check if audio array exists, grab and send off commands to appropriate items
+      if (audio_array != json) {
+        var String audio_channels  = transform("JSONPATH", "$.kodi_details.streamdetails.audio[0].channels", json)
+        var String audio_codec  = transform("JSONPATH", "$.kodi_details.streamdetails.audio[0].codec", json)
+        var String audio_language  = transform("JSONPATH", "$.kodi_details.streamdetails.audio[0].language", json)
+        
+        sendCommand(Kodi_Stream_Audio_Channels, audio_channels)
+        sendCommand(Kodi_Stream_Audio_Codec, audio_codec)
+        sendCommand(Kodi_Stream_Audio_Language, audio_language)
+      }
+      
+    }
+
+  end

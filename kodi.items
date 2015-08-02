@@ -1,0 +1,29 @@
+// MQTT Subscribe Raw Input
+String Kodi_PlaybackState_Raw         "Last Kodi Playback State (Raw) [%s]"  {mqtt="<[mosquitto:kodi/status/playbackstate:state:default]"}
+String Kodi_Title_Raw                 "Last Kodi Title (Raw) [%s]"           {mqtt="<[mosquitto:kodi/status/title:state:default]"}
+String Kodi_Progress_Raw              "Last Kodi Progress (Raw) [%s]"        {mqtt="<[mosquitto:kodi/status/progress:state:default]"}
+
+// Parsed MQTT Messages
+
+// kodi/status/progress
+String Kodi_Time                      "Playback Current: [%s]"
+String Kodi_TotalTime                 "Playback Total: [%s]"
+Number Kodi_Progress                  "Progress: [%d]"
+
+// kodi/status/title
+String Kodi_Title                     "Currently Playing: [%s]"
+String Kodi_Content_Type              "Content Type: [%s]"
+String Kodi_File_Path                 "File Path: [%s]"
+String Kodi_Label                     "Label: [%s]"
+String Kodi_Title_Value               "Title Value [%s]"
+String Kodi_Thumbnail                 "[%s]"
+String Kodi_Fanart                    "[%s]"
+String Kodi_Stream_Video_Stereomode   "Stereomode: [%s]"
+Number Kodi_Stream_Video_Width        "Video Width: [%.1f]"
+String Kodi_Stream_Video_Codec        "Video Codec: [%s]"
+Number Kodi_Stream_Video_Aspect       "Aspect Ratio: [%.1f]"
+Number Kodi_Stream_Video_Duration     "Duration: [%d]"
+Number Kodi_Stream_Video_Height       "Video Height [%d]"
+Number Kodi_Stream_Audio_Channels     "Audio Channels: [%d]"
+String Kodi_Stream_Audio_Codec        "Audio Codec: [%s]"
+String Kodi_Stream_Audio_Language     "Audio Language: [%s]"
