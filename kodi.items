@@ -8,7 +8,7 @@ String Kodi_Progress_Raw              "Last Kodi Progress (Raw) [%s]"        {mq
 // kodi/status/progress
 String Kodi_Time                      "Playback Current: [%s]"
 String Kodi_TotalTime                 "Playback Total: [%s]"
-Number Kodi_Progress                  "Progress: [%d]"
+Number Kodi_Progress                  "Progress: [%.1f]"
 
 // kodi/status/title
 String Kodi_Title                     "Currently Playing: [%s]"
